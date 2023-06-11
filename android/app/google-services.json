@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "488725256074",
+    "project_id": "talktalk-eeaf9",
+    "storage_bucket": "talktalk-eeaf9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:488725256074:android:daa77ad334e0076a0f5a73",
+        "android_client_info": {
+          "package_name": "com.megawhiz.talktalk"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "488725256074-u6s894un0d43ad02h1me7pie1623la4k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBH7MRxyOjGiK5ThrT6k7tkudv72yF87mk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "488725256074-u6s894un0d43ad02h1me7pie1623la4k.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "488725256074-5juog1396qdrgp79l5mtv43l97g7um6r.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.megawhiz.talktalk"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:488725256074:android:14e7b414687e47f10f5a73",
+        "android_client_info": {
+          "package_name": "com.sunnycheung.quizadmin.quiz_admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "488725256074-u6s894un0d43ad02h1me7pie1623la4k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBH7MRxyOjGiK5ThrT6k7tkudv72yF87mk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "488725256074-u6s894un0d43ad02h1me7pie1623la4k.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "488725256074-5juog1396qdrgp79l5mtv43l97g7um6r.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.megawhiz.talktalk"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
