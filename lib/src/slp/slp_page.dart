@@ -8,7 +8,6 @@ import 'package:tuple/tuple.dart';
 
 import '../core/types.dart';
 
-
 class SlpPage extends StatefulWidget {
   const SlpPage({Key? key}) : super(key: key);
 
@@ -17,9 +16,8 @@ class SlpPage extends StatefulWidget {
 }
 
 class _SlpPageState extends State<SlpPage> {
-  final List<Tuple2<String, Slp>> _slps = [];
-  final DatabaseReference _slpsRef =
-  FirebaseDatabase.instance.ref('/slp');
+  final List<Slp> _slps = [];
+  final DatabaseReference _slpsRef = FirebaseDatabase.instance.ref('/slp');
   bool _initialised = false;
 
   @override
@@ -44,11 +42,11 @@ class _SlpPageState extends State<SlpPage> {
     return _page(context);
   }
 
-
   void _initialise(DataSnapshot? data) {
     if (data != null && data.value != null) {
       dataSnapshotToMap(data.value!).forEach((id, json) {
-        _slps.add(Tuple2(id, Slp.fromJson(json)));
+        json['id'] = id;
+        _slps.add(Slp.fromJson(json));
       });
     }
     _initialised = true;
@@ -70,36 +68,36 @@ class _SlpPageState extends State<SlpPage> {
           ),
         ],
       ),
-      body: _slps.isEmpty
-          ? const Center(child: Text('沒有言語治療師'))
-          : Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.fromLTRB(8, 8, 8, 80),
-              // to prevent the actions being blocked by the FAB
-              itemCount: _slps.length,
-              itemBuilder: (context, i) => SlpTile(
-                slp: _slps[i].item2,
-                onSave: (slp) async {
-                  final id = _slps[i].item1;
-                  setState(() {
-                    _slps[i] = Tuple2(id, slp);
-                  });
-                  await _slpsRef.child(id).set(slp.toJson());
-                },
-                onDelete: () async {
-                  final id = _slps[i].item1;
-                  setState(() {
-                    _slps.removeAt(i);
-                  });
-                  await _slpsRef.child(id).remove();
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
+      // body: _slps.isEmpty
+      //     ? const Center(child: Text('沒有言語治療師'))
+      //     : Column(
+      //         children: [
+      //           Expanded(
+      //             child: ListView.builder(
+      //               padding: const EdgeInsets.fromLTRB(8, 8, 8, 80),
+      //               // to prevent the actions being blocked by the FAB
+      //               itemCount: _slps.length,
+      //               itemBuilder: (context, i) => SlpTile(
+      //                 slp: _slps[i].item2,
+      //                 onSave: (slp) async {
+      //                   final id = _slps[i].item1;
+      //                   setState(() {
+      //                     _slps[i] = Tuple2(id, slp);
+      //                   });
+      //                   await _slpsRef.child(id).set(slp.toJson());
+      //                 },
+      //                 onDelete: () async {
+      //                   final id = _slps[i].item1;
+      //                   setState(() {
+      //                     _slps.removeAt(i);
+      //                   });
+      //                   await _slpsRef.child(id).remove();
+      //                 },
+      //               ),
+      //             ),
+      //           ),
+      //         ],
+      //       ),
       floatingActionButton: FloatingActionButton.extended(
         label: const Text("新增言語治療師"),
         icon: const Icon(Icons.add),
@@ -107,12 +105,12 @@ class _SlpPageState extends State<SlpPage> {
           Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => SlpEditPage(
               title: "新增言語治療師",
-              onSave: (slp) async {
+              onSave: (slpNew) async {
                 final ref = _slpsRef.push(); // gets a new school location
                 final id = basename(ref.path);
-                await ref.set(slp.toJson());
+                await ref.set(slpNew.toJson());
                 setState(() {
-                  _slps.add(Tuple2(id, slp));
+                  _slps.add(slpNew);
                 });
               },
             ),

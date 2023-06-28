@@ -7,6 +7,7 @@ class StudentEditPage extends StatefulWidget {
   final void Function(Student) onSave;
   final String title;
 
+  /// When [onSave] is called, the student's id will NOT be populated.
   const StudentEditPage({
     Key? key,
     this.initialStudent,
@@ -20,17 +21,28 @@ class StudentEditPage extends StatefulWidget {
 
 class _StudentEditPageState extends State<StudentEditPage> {
   late TextEditingController _nameController;
-  late TextEditingController _diagnosisController;
-  late TextEditingController _genderController;
+  bool _nameValid = true;
+
   late TextEditingController _formController;
-  late Gender _gender;
-  late DateTime _dob;
   late StudentForm _form;
+
+  late TextEditingController _genderController;
+  late Gender _gender;
+
+  late TextEditingController _diagnosisController;
+  late DateTime _dob;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.initialStudent?.name);
+    _nameController = TextEditingController(text: widget.initialStudent?.name)
+      ..addListener(() {
+        if (_nameController.text.isNotEmpty) {
+          setState(() {
+            _nameValid = true;
+          });
+        }
+      });
     _diagnosisController =
         TextEditingController(text: widget.initialStudent?.diagnosis);
     _gender = widget.initialStudent?.gender ?? Gender.values[0];
@@ -60,15 +72,17 @@ class _StudentEditPageState extends State<StudentEditPage> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.person),
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextField(
                               controller: _nameController,
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
+                                prefixIcon: const Icon(Icons.person),
+                                errorText: _nameValid ? null : '名稱不能為空',
                                 labelText: '學生名稱',
-                                border: OutlineInputBorder(),
+                                helperText: '*必須填寫',
+                                border: const OutlineInputBorder(),
                               ),
                             ),
                           ),
@@ -76,31 +90,32 @@ class _StudentEditPageState extends State<StudentEditPage> {
                       ],
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Icon(Icons.wc),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: DropdownMenu<Gender>(
+                            leadingIcon: const Icon(Icons.wc),
                             controller: _genderController,
                             label: const Text("性別"),
-                            dropdownMenuEntries: Gender.values.map(
-                                (e) => DropdownMenuEntry(value: e, label: e.chineseName)
-                            ).toList(),
+                            dropdownMenuEntries: Gender.values
+                                .map((e) => DropdownMenuEntry(
+                                    value: e, label: e.chineseName))
+                                .toList(),
                             textStyle: Theme.of(context).textTheme.titleMedium,
                             onSelected: (gender) => _gender = gender!,
                           ),
                         ),
-                        const Spacer(),
-                        const Icon(Icons.school),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: DropdownMenu<StudentForm>(
+                            leadingIcon: const Icon(Icons.school),
                             controller: _formController,
                             label: const Text("級別"),
-                            dropdownMenuEntries: StudentForm.values.map(
-                                    (e) => DropdownMenuEntry(value: e, label: e.chineseName)
-                            ).toList(),
+                            dropdownMenuEntries: StudentForm.values
+                                .map((e) => DropdownMenuEntry(
+                                    value: e, label: e.chineseName))
+                                .toList(),
                             textStyle: Theme.of(context).textTheme.titleMedium,
                             onSelected: (form) => _form = form!,
                           ),
@@ -109,19 +124,21 @@ class _StudentEditPageState extends State<StudentEditPage> {
                     ),
                     Row(
                       children: [
-                        const Icon(Icons.calendar_month),
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: ElevatedButton(
-                              child:
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(Icons.edit_outlined),
-                                      Text('出生日期: ${_dob.year}年 ${_dob.month}月 ${_dob.day}日'),
-                                    ],
+                            child: FilledButton.tonal(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.all(2),
+                                    child: Icon(Icons.calendar_month),
                                   ),
+                                  Text(
+                                      '出生日期: ${_dob.year}年${_dob.month}月${_dob.day}日'),
+                                ],
+                              ),
                               onPressed: () async {
                                 final dob = await showDatePicker(
                                   context: context,
@@ -142,13 +159,13 @@ class _StudentEditPageState extends State<StudentEditPage> {
                     ),
                     Row(
                       children: [
-                        const Icon(Icons.description),
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextField(
                               controller: _diagnosisController,
                               decoration: const InputDecoration(
+                                prefixIcon: Icon(Icons.description),
                                 labelText: '診斷',
                                 border: OutlineInputBorder(),
                               ),
@@ -162,14 +179,20 @@ class _StudentEditPageState extends State<StudentEditPage> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        widget.onSave.call(Student(
-                          _nameController.text,
-                          _gender,
-                          _dob,
-                          _diagnosisController.text,
-                          _form,
-                        ));
-                        Navigator.of(context).pop();
+                        setState(() {
+                          _nameValid = _nameController.text.isNotEmpty;
+                        });
+                        if (_nameValid) {
+                          widget.onSave.call(Student(
+                            _nameController.text,
+                            _gender,
+                            _dob,
+                            _diagnosisController.text,
+                            _form,
+                            '',
+                          ));
+                          Navigator.of(context).pop();
+                        }
                       },
                       child: const Text("確認"),
                     ),

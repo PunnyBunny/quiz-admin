@@ -1,22 +1,21 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:quiz_admin/src/core/types.dart';
 import 'package:quiz_admin/src/core/utils.dart';
-import 'package:quiz_admin/src/student/student_page.dart';
 
 class SchoolEditPage extends StatefulWidget {
   final School? initialSchool;
   final List<Student>? initialStudents;
   final void Function(School) onSave;
   final String title;
-  final String? schoolId;
 
+  /// When [onSave] is called, the school's id will NOT be populated.
   const SchoolEditPage({
     Key? key,
     this.initialSchool,
     this.initialStudents,
     required this.onSave,
     required this.title,
-    this.schoolId,
   }) : super(key: key);
 
   @override
@@ -25,22 +24,59 @@ class SchoolEditPage extends StatefulWidget {
 
 class _SchoolEditPageState extends State<SchoolEditPage> {
   late TextEditingController _nameController;
+  bool _nameValid = true;
+
   late TextEditingController _phoneNumberController;
-  late TextEditingController _emailController;
-  late TextEditingController _addressController;
-  late TextEditingController _websiteController;
+  bool _phoneNumberValid = true;
+
   late TextEditingController _schoolTypeController;
   late SchoolType _schoolType;
+
+  late TextEditingController _emailController;
+  bool _emailValid = true;
+
+  late TextEditingController _addressController;
+  bool _addressValid = true;
+
+  late TextEditingController _websiteController;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.initialSchool?.name);
+    _nameController = TextEditingController(text: widget.initialSchool?.name)
+      ..addListener(() {
+        if (_nameController.text.isNotEmpty) {
+          setState(() {
+            _nameValid = true;
+          });
+        }
+      });
     _phoneNumberController =
-        TextEditingController(text: widget.initialSchool?.phoneNum);
-    _emailController = TextEditingController(text: widget.initialSchool?.email);
+        TextEditingController(text: widget.initialSchool?.phoneNum)
+          ..addListener(() {
+            if (_phoneNumberController.text.length == 8) {
+              setState(() {
+                _phoneNumberValid = true;
+              });
+            }
+          });
+    _emailController = TextEditingController(text: widget.initialSchool?.email)
+      ..addListener(() {
+        if (EmailValidator.validate(_emailController.text)) {
+          setState(() {
+            _emailValid = true;
+          });
+        }
+      });
     _addressController =
-        TextEditingController(text: widget.initialSchool?.address);
+        TextEditingController(text: widget.initialSchool?.address)
+          ..addListener(() {
+            if (_addressController.text.isNotEmpty) {
+              setState(() {
+                _addressValid = true;
+              });
+            }
+          });
     _websiteController =
         TextEditingController(text: widget.initialSchool?.website);
     _schoolType = widget.initialSchool?.type ??
@@ -55,8 +91,7 @@ class _SchoolEditPageState extends State<SchoolEditPage> {
       onWillPop: () async {
         return await showLeaveDialog(context);
       },
-      child: GestureDetector(
-        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: CloseKeyboardOnTap(
         child: Scaffold(
           appBar: AppBar(
             title: Text(widget.title),
@@ -66,34 +101,19 @@ class _SchoolEditPageState extends State<SchoolEditPage> {
             children: [
               Column(
                 children: [
-                  if (widget.schoolId != null)
-                    ElevatedButton(
-                      onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => StudentPage(
-                            schoolId: widget.schoolId!,
-                          ),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text("修改學生"),
-                          Icon(Icons.person_outline),
-                        ],
-                      ),
-                    ),
                   Row(
                     children: [
-                      const Icon(Icons.school),
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TextField(
                             controller: _nameController,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
+                              prefixIcon: const Icon(Icons.school),
+                              errorText: _nameValid ? null : '學校名稱不能為空',
                               labelText: '學校名稱',
-                              border: OutlineInputBorder(),
+                              helperText: '*必須填寫',
+                              border: const OutlineInputBorder(),
                             ),
                           ),
                         ),
@@ -102,24 +122,26 @@ class _SchoolEditPageState extends State<SchoolEditPage> {
                   ),
                   Row(
                     children: [
-                      const Icon(Icons.phone),
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.all(10.0),
                           child: TextField(
                             controller: _phoneNumberController,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
+                              prefixIcon: const Icon(Icons.phone),
+                              errorText: _phoneNumberValid ? null : '電話必須為8位數字',
                               labelText: '學校電話',
-                              border: OutlineInputBorder(),
+                              helperText: '*必須填寫',
+                              border: const OutlineInputBorder(),
                             ),
                             keyboardType: TextInputType.number,
                           ),
                         ),
                       ),
-                      const Icon(Icons.attach_money),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: DropdownMenu<SchoolType>(
+                          leadingIcon: const Icon(Icons.attach_money),
                           controller: _schoolTypeController,
                           label: const Text("學校類型"),
                           dropdownMenuEntries: SchoolType.values
@@ -132,21 +154,24 @@ class _SchoolEditPageState extends State<SchoolEditPage> {
                             _schoolType = type!;
                             // non-nullable because all options are non-null
                           },
+                          helperText: '', // to match the padding
                         ),
                       ),
                     ],
                   ),
                   Row(
                     children: [
-                      const Icon(Icons.email),
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TextField(
                             controller: _emailController,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
+                              prefixIcon: const Icon(Icons.email),
+                              errorText: _emailValid ? null : '電子郵件格式不正確',
                               labelText: '學校電子郵件',
-                              border: OutlineInputBorder(),
+                              helperText: '*必須填寫',
+                              border: const OutlineInputBorder(),
                             ),
                           ),
                         ),
@@ -155,15 +180,17 @@ class _SchoolEditPageState extends State<SchoolEditPage> {
                   ),
                   Row(
                     children: [
-                      const Icon(Icons.home),
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TextField(
                             controller: _addressController,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
+                              prefixIcon: const Icon(Icons.home),
+                              errorText: _addressValid ? null : '地址不能為空',
                               labelText: '學校地址',
-                              border: OutlineInputBorder(),
+                              helperText: '*必須填寫',
+                              border: const OutlineInputBorder(),
                             ),
                           ),
                         ),
@@ -172,13 +199,13 @@ class _SchoolEditPageState extends State<SchoolEditPage> {
                   ),
                   Row(
                     children: [
-                      const Icon(Icons.language),
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TextField(
                             controller: _websiteController,
                             decoration: const InputDecoration(
+                              prefixIcon: Icon(Icons.language),
                               labelText: '學校網站',
                               border: OutlineInputBorder(),
                             ),
@@ -189,16 +216,30 @@ class _SchoolEditPageState extends State<SchoolEditPage> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      widget.onSave.call(School(
-                        _nameController.text,
-                        _schoolType,
-                        _phoneNumberController.text,
-                        _emailController.text,
-                        _addressController.text,
-                        _websiteController.text,
-                        // _students,
-                      ));
-                      Navigator.of(context).pop();
+                      setState(() {
+                        _nameValid = _nameController.text.isNotEmpty;
+                        _phoneNumberValid =
+                            _phoneNumberController.text.length == 8;
+                        _emailValid =
+                            EmailValidator.validate(_emailController.text);
+                        _addressValid = _addressController.text.isNotEmpty;
+                      });
+
+                      if (_nameValid &&
+                          _phoneNumberValid &&
+                          _emailValid &&
+                          _addressValid) {
+                        widget.onSave.call(School(
+                          _nameController.text,
+                          _schoolType,
+                          _phoneNumberController.text,
+                          _emailController.text,
+                          _addressController.text,
+                          _websiteController.text,
+                          '',
+                        ));
+                        Navigator.of(context).pop();
+                      }
                     },
                     child: const Text("確認"),
                   )

@@ -13,6 +13,7 @@ School _$SchoolFromJson(Map<String, dynamic> json) => School(
       json['email'] as String,
       json['address'] as String,
       json['website'] as String,
+      json['id'] as String,
     );
 
 Map<String, dynamic> _$SchoolToJson(School instance) => <String, dynamic>{
@@ -22,6 +23,7 @@ Map<String, dynamic> _$SchoolToJson(School instance) => <String, dynamic>{
       'email': instance.email,
       'address': instance.address,
       'website': instance.website,
+      'id': instance.id,
     };
 
 const _$SchoolTypeEnumMap = {
@@ -35,6 +37,7 @@ Slp _$SlpFromJson(Map<String, dynamic> json) => Slp(
       json['email'] as String,
       json['password'] as String,
       $enumDecode(_$GenderEnumMap, json['gender']),
+      json['id'] as String,
     );
 
 Map<String, dynamic> _$SlpToJson(Slp instance) => <String, dynamic>{
@@ -42,6 +45,7 @@ Map<String, dynamic> _$SlpToJson(Slp instance) => <String, dynamic>{
       'email': instance.email,
       'password': instance.password,
       'gender': _$GenderEnumMap[instance.gender]!,
+      'id': instance.id,
     };
 
 const _$GenderEnumMap = {
@@ -55,6 +59,7 @@ Student _$StudentFromJson(Map<String, dynamic> json) => Student(
       DateTime.parse(json['dob'] as String),
       json['diagnosis'] as String,
       $enumDecode(_$StudentFormEnumMap, json['form']),
+      json['id'] as String,
     );
 
 Map<String, dynamic> _$StudentToJson(Student instance) => <String, dynamic>{
@@ -63,6 +68,7 @@ Map<String, dynamic> _$StudentToJson(Student instance) => <String, dynamic>{
       'dob': instance.dob.toIso8601String(),
       'diagnosis': instance.diagnosis,
       'form': _$StudentFormEnumMap[instance.form]!,
+      'id': instance.id,
     };
 
 const _$StudentFormEnumMap = {

@@ -1,7 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quiz_admin/firebase_options.dart';
+import 'package:quiz_admin/src/core/bloc/authentication_bloc.dart';
 import 'package:quiz_admin/src/home_page.dart';
+import 'package:quiz_admin/src/login/login_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,16 +17,18 @@ void main() async {
 class QuizAdmin extends StatelessWidget {
   const QuizAdmin({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'quiz admin',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return BlocProvider(
+      create: (context) => AuthenticationBloc(),
+      child: MaterialApp(
+        title: 'quiz admin',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: const LoginPage(),
       ),
-      home: const HomePage(),
     );
   }
 }

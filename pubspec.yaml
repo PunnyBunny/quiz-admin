@@ -42,6 +42,11 @@ dependencies:
   build_runner: ^2.4.5
   tuple: ^2.0.1
   path: ^1.8.3
+  flutter_bloc: ^8.1.3
+  bloc: ^8.1.2
+  meta: ^1.9.1
+  firebase_auth: ^4.6.3
+  email_validator: ^2.1.17
 
 
 dev_dependencies:
